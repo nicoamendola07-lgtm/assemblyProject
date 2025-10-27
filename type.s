@@ -47,8 +47,8 @@ main:				# Start of the main function
 	# The number of arguments we have lives in register rdi
 	# If we don't have exactly 2 arguments, go to the error function
 
-cmp rdi, 2
-jne error
+	cmp rdi, 2
+	jne error
 
 	mov	rdi, [rsi + 8]	# Get file name to open
 
@@ -67,14 +67,14 @@ jne error
 	# Whenever a function gives you back a number, that number will
 	# live in the rax register.
 
-cmp rax, 0
-jl error
+	cmp rax, 0
+	jl error
 
 	# Now, we should save the number the open function gave back to us
 	# Let's save it to the rbx register (for reasons outside this
 	# class, it needs to be the rbx register; come talk to me
 	# during office hours if you are curious why).
-
+	mov rbx, rax
 	# The last sub-problem to solve in the main function is to give
 	# ourselves some space to store the letters we read from the file.
 	# We will use rsp for this. Remember that when our program starts,
@@ -84,18 +84,18 @@ jl error
 	# subtract and not add is beyond the scope of this class).
 	# How many bytes do we need to store one ASCII character? Give
 	# yourself at least that many bytes of storage space.
-
+	sub rsp, 1
 loop:				# Start of the loop function
 	# The loop function is where all the real work happens.
-
+	
 	# The first sub-problem is putting the value we saved to rbx
 	# into the first argument for read.
-
+	mov rdi, rbx
 	# Next, we put the value of rsp into the second argument. 
-
+	mov rsi, rsp
 	# Finally, we put 1 into rdx. The rdx register is always the
 	# third argument for a function.
-
+	mov rdx, 1
 	mov	rax, 0		# Put 0 (read) into function number
 	syscall			# Call read with 3 arguments
 
@@ -105,13 +105,18 @@ loop:				# Start of the loop function
 	# and put every character on the screen.
 	# If it is less than 0, we should go to the error function
 	# because it means something bad happened.
-
+	cmp rax, 0
+	je done
+	jl error
 	# After we read in a letter, we need to put that letter on
 	# the screen.
 	# To do that: put 1 in the first argument, put the value of
 	# rsp in the second argument, and put 1 in the third argument
 	# A 1 in the first argument is shorthand for the screen
-
+	mov rdi, 1
+	mov rsi, rsp
+	mov rdx, 1
+	mov rax, 1
 	mov	rax, 1		# Put 1 (write) into function number
 	syscall			# Call write with 3 arguments
 
@@ -119,16 +124,17 @@ loop:				# Start of the loop function
 	# the write function is 1. If it is not equal to 1, then we
 	# should go to the error function because it means something
 	# bad happened.
-
+	cmp rax, 1
+	jne error
 	# Last sub-problem for the loop function: if we got all the
 	# way here, it means everything was successful for this
 	# letter and we should jump back to the top of the loop
 	# function so we can do it all again with the next letter.
-
+	jmp loop
 done:				# Start of the done function
 	# Here, put 0 into the first argument
 	# If a program exits with 0, that means it was successful
-
+	mov rdi, 0
 	mov	rax, 60		# Put 60 (exit) into function number
 	syscall			# Call exit with an argument of 0
 error:				# Start of the error function
