@@ -116,7 +116,6 @@ loop:				# Start of the loop function
 	mov rdi, 1
 	mov rsi, rsp
 	mov rdx, 1
-	mov rax, 1
 	mov	rax, 1		# Put 1 (write) into function number
 	syscall			# Call write with 3 arguments
 
